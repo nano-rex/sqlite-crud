@@ -19,7 +19,7 @@ def add_prefix_to_last_word(text, prefix):
 
 def open_folder():
     global filepath1
-    filepath1 = filedialog.askopenfilename(filetypes=[("Excel Files", "*.xlsx")])
+    filepath1 = filedialog.askopenfilename(initialdir="/home/user/Desktop", filetypes=[("Excel Files", "*.xlsx")])
 
 def gch():
     global filepath1
