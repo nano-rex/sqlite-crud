@@ -1,5 +1,4 @@
-# Create-Retrieve-Update-Delete
-**with sqlite**
+# Sqlite Create-Retrieve-Update-Delete
 
 ### Diagram
 ```mermaid
@@ -31,20 +30,20 @@ class Delete{
 }
 ```
 
-### Prerequisite
+### How to run?
 
 #### Python
-``pip install --user sqlite``
-``python3 crud.py``
+``pip install --user sqlite
+python3 crud.py``
 
 #### Java
-``java -classpath crud.java``
+``java -classpath sqlite-jdbc-*.jar crud.java``
 
 #### C++
-``g++ crud.cpp -o out.crud.cpp``
-``./out.crud.cpp``
+``g++ crud.cpp -o out.crud.cpp
+./out.crud.cpp``
 
 #### C
-``gcc crud.c -o out.crud.c``
-``./out.crud.cpp``
+``gcc crud.c -o out.crud.c
+./out.crud.cpp``
 
