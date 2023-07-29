@@ -92,8 +92,10 @@ def gch():
     img2.anchor = 'H46'
     ws.add_image(img2)
     wb.save(filepath2)
-    print("GCH invoice generated successfully!")
-    print("Output path: " + filepath2)
+    success_message = "GCH invoice generated successfully!"
+    output_path = "Output path: " + filepath2
+    success_label.config(text=success_message)
+    output_label.config(text=output_path)
 
 def d_o():
     global filepath1
@@ -182,8 +184,10 @@ def d_o():
     img2.anchor = 'H46'
     ws.add_image(img2)
     wb.save(filepath2)
-    print("D.O invoice generated successfully!")
-    print("Output path: " + filepath2)
+    success_message = "D.O invoice generated successfully!"
+    output_path = "Output path: " + filepath2
+    success_label.config(text=success_message)
+    output_label.config(text=output_path)
 
 def dm():
     global filepath1
@@ -261,8 +265,10 @@ def dm():
     img2.anchor = 'H46'
     ws.add_image(img2)
     wb.save(filepath2)
-    print("DM invoice generated successfully!")
-    print("Output path: " + filepath2)
+    success_message = "DM invoice generated successfully!"
+    output_path = "Output path: " + filepath2
+    success_label.config(text=success_message)
+    output_label.config(text=output_path)
 
 def open_gui():
     global filepath1
@@ -300,6 +306,14 @@ def open_gui():
 
     dm_button = tkinter.Button(root, text="DM", command=dm_button_click)
     dm_button.pack()
+
+    # Add success message label
+    success_label = tkinter.Label(root, text="")
+    success_label.pack()
+
+    # Add output path label
+    output_label = tkinter.Label(root, text="")
+    output_label.pack()
 
     root.mainloop()
 
