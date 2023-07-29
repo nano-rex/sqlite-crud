@@ -289,6 +289,10 @@ def open_gui():
     text_below_button = tkinter.Label(root, text="Click one of the buttons below to generate the invoice:")
     text_below_button.pack()
 
+    # Create a frame to hold the buttons
+    button_frame = tkinter.Frame(root)
+    button_frame.pack()
+
     def gch_button_click():
         gch()
 
@@ -298,14 +302,14 @@ def open_gui():
     def dm_button_click():
         dm()
 
-    gch_button = tkinter.Button(root, text="GCH", command=gch_button_click)
-    gch_button.pack()
+    gch_button = tkinter.Button(button_frame, text="GCH", command=gch_button_click)
+    gch_button.pack(side=tkinter.LEFT)
 
-    d_o_button = tkinter.Button(root, text="D.O", command=d_o_button_click)
-    d_o_button.pack()
+    d_o_button = tkinter.Button(button_frame, text="D.O", command=d_o_button_click)
+    d_o_button.pack(side=tkinter.LEFT)
 
-    dm_button = tkinter.Button(root, text="DM", command=dm_button_click)
-    dm_button.pack()
+    dm_button = tkinter.Button(button_frame, text="DM", command=dm_button_click)
+    dm_button.pack(side=tkinter.LEFT)
 
     # Add success message label
     success_label = tkinter.Label(root, text="")
