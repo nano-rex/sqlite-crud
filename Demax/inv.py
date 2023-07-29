@@ -205,28 +205,6 @@ def dm():
   sheetname['B49'] = str(desc19)
   srcfile.save(filepath2)
 
-# Find and replace/remove "nan"
-sheet1 = srcfile.active
-for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
-	for cell in col:
-		if cell.value == 'nan':
-			cell.value = ''
-srcfile.save(filepath2)
-
-# Insert Logo image to Invoice
-wb = openpyxl.load_workbook(filepath2)
-ws = wb['Sheet1']
-img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
-img.anchor = 'A3' # Or whatever cell location you want to use.
-ws.add_image(img)
-img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
-img1.anchor = 'G47'
-ws.add_image(img1)
-img2 = openpyxl.drawing.image.Image('/home/user/Templates/demax_stamp_small.png')
-img2.anchor = 'H46'
-ws.add_image(img2)
-wb.save(filepath2)
-
 # User input for function selection
 print("Select:")
 option = input("Select an option (1: gch, 2: d_o, 3: dm): ")
