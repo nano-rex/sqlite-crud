@@ -1,150 +1,168 @@
-#!/bin/python3
+const sqlite3 = require('sqlite3').verbose();
+const readline = require('readline');
 
-import sqlite3
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-####################################################
-def create():
-	conn = sqlite3.connect('data.db')
-	print("Opened database successfully");
-	conn.execute('''
-		CREATE TABLE Users
-		(ID      INT   PRIMARY KEY  NOT NULL,
-		 NAME    TEXT               NOT NULL,
-		 AGE     INT                NOT NULL,
-		 GENDER  TEXT,
-		 SALARY  INT);
-	''')
-	print("Table created successfully");
+const db = new sqlite3.Database('data.db');
 
-####################################################
-# FOR CREATING RECORDS FUNCTION DEFINITION
-def insert():
-#	try:
-		con = sqlite3.connect("data.db")
-		cursor = con.cursor()
-		while (True):
-			idd = int(input("Enter ID: "))
-			name = input("Enter Name: ")
-			age = int(input("Enter Age: "))
-			gender = input("Enter your Gender: ")
-			salary = int(input("Enter your Salary: "))
-			query = "INSERT into USERS(ID,NAME,AGE,GENDER,SALARY) VALUES (?,?,?,?,?);"
-			data = (idd,name,age,gender,salary)
-			cursor.execute(query, data)
-			con.commit()
-			if(cursor.execute(query,data)):
-				print("Data Inserted Successfully")
-			else:
-				print("Data not Inserted")
-#			ch = input("Do You want to Add More Records(Y/N): ")
-#			if ch == "N" or ch == "n":
-#				cursor.close()
-#				break
-#			else:
-#				pass
-#	except:
-#		print("Error in Record Creation\n")
+function create() {
+  db.serialize(() => {
+    db.run(`
+      CREATE TABLE IF NOT EXISTS Users (
+        ID INTEGER PRIMARY KEY NOT NULL,
+        NAME TEXT NOT NULL,
+        AGE INTEGER NOT NULL,
+        GENDER TEXT,
+        SALARY INTEGER
+      )
+    `, (err) => {
+      if (err) {
+        console.error('Table creation error:', err);
+      } else {
+        console.log('Table created successfully');
+      }
+    });
+  });
+}
 
-####################################################
-# FOR READING ONE RECORD FUNCTION DEFINITION
-def read_one():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    ids = int(input("Enter Your ID: "))
-    query = "SELECT * from USERS WHERE id = ?"
-    result = cursor.execute(query, (ids,))
-    if (result):
-        for i in result:
-            print(f"Name is: {i[1]}")
-            print(f"Age is: {i[2]}")
-            print(f"Salary is: {i[4]}")
-    else:
-        print("Roll Number Does not Exist")
-        cursor.close()
+function insert() {
+  rl.question('Enter ID: ', (idd) => {
+    rl.question('Enter Name: ', (name) => {
+      rl.question('Enter Age: ', (age) => {
+        rl.question('Enter your Gender: ', (gender) => {
+          rl.question('Enter your Salary: ', (salary) => {
+            const query = 'INSERT INTO Users (ID, NAME, AGE, GENDER, SALARY) VALUES (?, ?, ?, ?, ?)';
+            const data = [idd, name, age, gender, salary];
+            db.run(query, data, (err) => {
+              if (err) {
+                console.error('Data insertion error:', err);
+              } else {
+                console.log('Data inserted successfully');
+              }
+              rl.close();
+            });
+          });
+        });
+      });
+    });
+  });
+}
 
-####################################################
-# FOR READING ALL RECORDS FUNCTION DEFINITION
-def read_all():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    query = "SELECT * from USERS"
-    result = cursor.execute(query)
-    if (result):
-        print("\n&lt;===Available Records===&gt;")
-        for i in result:
-            print(f"Name is : {i[1]}")
-            print(f"Age is : {i[2]}")
-            print(f"Salary is : {i[4]}\n")
-    else:
-        pass
-    
-####################################################
-# FOR UPDATING RECORDS FUNCTION DEFINITION
-def update():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    name = input("Enter Name: ")
-    age = int(input("Enter Age: "))
-    gender = input("Enter Gender: ")
-    salary = int(input("Enter Salary: "))
-    data = (name, age, gender, salary, idd,)
-    query = "UPDATE USERS set name = ?, age = ?, gender = ?, salary = ? WHERE id = ?"
-    result = cursor.execute(query, data)
-    con.commit()
-    cursor.close()
-    if (result):
-        print("Records Updated")
-    else:
-        print("Something Error in Updation")
+function readOne() {
+  rl.question('Enter Your ID: ', (ids) => {
+    const query = 'SELECT * FROM Users WHERE ID = ?';
+    db.get(query, [ids], (err, row) => {
+      if (err) {
+        console.error('Read one record error:', err);
+      } else if (row) {
+        console.log(`Name is: ${row.NAME}`);
+        console.log(`Age is: ${row.AGE}`);
+        console.log(`Salary is: ${row.SALARY}`);
+      } else {
+        console.log('Record does not exist');
+      }
+      rl.close();
+    });
+  });
+}
 
-####################################################
-# FOR DELETING RECORDS FUNCTION DEFINITION
-def delete():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    query = "DELETE from USERS where ID = ?"
-    result = cursor.execute(query, (idd,))
-    con.commit()
-    cursor.close()
-    if (result):
-        print("One record Deleted")
-    else:
-        print("Something Error in Deletion")
+function readAll() {
+  const query = 'SELECT * FROM Users';
+  db.all(query, (err, rows) => {
+    if (err) {
+      console.error('Read all records error:', err);
+    } else if (rows.length > 0) {
+      console.log('\n<=== Available Records ===>');
+      rows.forEach((row) => {
+        console.log(`Name is: ${row.NAME}`);
+        console.log(`Age is: ${row.AGE}`);
+        console.log(`Salary is: ${row.SALARY}\n`);
+      });
+    } else {
+      console.log('No records found');
+    }
+    rl.close();
+  });
+}
 
-####################################################
-# MAIN BLOCK
-try:
-    while (True):
-        print("1). Insert Records: ")
-        print("2). Read Records: ")
-        print("3). Update Records: ")
-        print("4). Delete Records: ")
-        print("5). Exit")
-        ch = int(input("Enter Your Choice: "))
-        if (ch == 1):
-            insert()
-        elif (ch == 2):
-            print("1). Read Single Record")
-            print("2). Read All Records")
-            choice = int(input("Enter Your Choice: "))
-            if (choice == 1):
-                read_one()
-            elif (choice == 2):
-                read_all()
-            else:
-                print("Wrong Choice Entered")
-        elif (ch == 3):
-            update()
-        elif (ch == 4):
-            delete()
-        elif (ch == 5):
-            break
-        else:
-            print("Enter Correct Choice")
-except:
-    print("Database Error")
+function update() {
+  rl.question('Enter ID: ', (idd) => {
+    rl.question('Enter Name: ', (name) => {
+      rl.question('Enter Age: ', (age) => {
+        rl.question('Enter Gender: ', (gender) => {
+          rl.question('Enter Salary: ', (salary) => {
+            const query = 'UPDATE Users SET NAME = ?, AGE = ?, GENDER = ?, SALARY = ? WHERE ID = ?';
+            const data = [name, age, gender, salary, idd];
+            db.run(query, data, (err) => {
+              if (err) {
+                console.error('Record update error:', err);
+              } else {
+                console.log('Record updated successfully');
+              }
+              rl.close();
+            });
+          });
+        });
+      });
+    });
+  });
+}
 
-####################################################
-#END
+function remove() {
+  rl.question('Enter ID: ', (idd) => {
+    const query = 'DELETE FROM Users WHERE ID = ?';
+    db.run(query, [idd], (err) => {
+      if (err) {
+        console.error('Record deletion error:', err);
+      } else {
+        console.log('Record deleted successfully');
+      }
+      rl.close();
+    });
+  });
+}
+
+function main() {
+  rl.question('1) Insert Records\n2) Read Records\n3) Update Records\n4) Delete Records\n5) Exit\nEnter Your Choice: ', (ch) => {
+    switch (ch) {
+      case '1':
+        insert();
+        break;
+      case '2':
+        rl.question('1) Read Single Record\n2) Read All Records\nEnter Your Choice: ', (choice) => {
+          if (choice === '1') {
+            readOne();
+          } else if (choice === '2') {
+            readAll();
+          } else {
+            console.log('Wrong choice entered');
+            rl.close();
+          }
+        });
+        break;
+      case '3':
+        update();
+        break;
+      case '4':
+        remove();
+        break;
+      case '5':
+        rl.close();
+        break;
+      default:
+        console.log('Enter correct choice');
+        rl.close();
+        break;
+    }
+  });
+}
+
+create();
+main();
+
+process.on('exit', () => {
+  db.close();
+});
