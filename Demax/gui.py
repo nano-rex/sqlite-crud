@@ -263,8 +263,19 @@ def open_gui():
     root = tkinter.Tk()
     root.title("Demax Invoice Generator")
 
+    # Add text above the open folder button
+    text_above_button = tkinter.Label(root, text="Please select an Excel file:")
+    text_above_button.pack()
+
     def open_folder_button_click():
         open_folder()
+
+    open_folder_button = tkinter.Button(root, text="Open Folder", command=open_folder_button_click)
+    open_folder_button.pack()
+
+    # Add text below the open folder button
+    text_below_button = tkinter.Label(root, text="Click one of the buttons below to generate the invoice:")
+    text_below_button.pack()
 
     def gch_button_click():
         gch()
@@ -274,9 +285,6 @@ def open_gui():
 
     def dm_button_click():
         dm()
-
-    open_folder_button = tkinter.Button(root, text="Open Folder", command=open_folder_button_click)
-    open_folder_button.pack()
 
     gch_button = tkinter.Button(root, text="GCH", command=gch_button_click)
     gch_button.pack()
