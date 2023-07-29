@@ -1,24 +1,21 @@
 #!/bin/python3
 
-import pandas as pd # .xlsx
-import openpyxl # .xlsx
-import sys # $1
-import shutil # cp
+import pandas as pd
+import openpyxl
+import sys
+import shutil
 import tkinter
+from tkinter import filedialog
 
-#filepath1 = str(sys.argv[1])
 filepath1 = ""
 
 def add_prefix_to_last_word(text, prefix):
-	words = text.split("/") # Split the text by forward slashes
-	last_word = words[-1] # Get the last word after the last forward slash
-	new_last_word = prefix + last_word # Add the prefix to the last word
-	words[-1] = new_last_word # Replace the last word with the updated one 
-	modified_text = "/".join(words) # Join the words back together with forward slashes
-	return modified_text
-text = filepath1
-prefix = "INV_"
-filepath2 = add_prefix_to_last_word(text, prefix)
+    words = text.split("/")
+    last_word = words[-1]
+    new_last_word = prefix + last_word
+    words[-1] = new_last_word
+    modified_text = "/".join(words)
+    return modified_text
 
 def open_folder():
     global filepath1
@@ -27,9 +24,8 @@ def open_folder():
 def gch():
     global filepath1
     filepath2 = add_prefix_to_last_word(filepath1, "INV_")
-    shutil.copyfile('/home/user/Templates/INV_GCH.xlsx', filepath2) # Copy Invoice template as destination xlsx
+    shutil.copyfile('/home/user/Templates/INV_GCH.xlsx', filepath2)
     df = pd.read_excel(filepath1, sheet_name='Sheet1', header=None)
-    # Read(copy) Work Order
     inv_no = df.loc[10,7]
     date_ = df.loc[12,7]
     po_no = df.loc[14,7]
@@ -55,7 +51,6 @@ def gch():
     desc19 = df.loc[40,1]
     srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=False)
     sheetname = srcfile['Sheet1']
-    # Write(paste) to Invoice
     sheetname['H11'] = str(inv_no)
     sheetname['H13'] = str(date_)
     sheetname['H15'] = str(po_no)
@@ -72,25 +67,23 @@ def gch():
     sheetname['B33'] = str(desc10)
     sheetname['B34'] = str(desc11)
     sheetname['B35'] = str(desc12)
-    sheetname['B36'] = str(desc13) # Site address
+    sheetname['B36'] = str(desc13)
     sheetname['B37'] = str(desc14)
     sheetname['B38'] = str(desc15)
     sheetname['B39'] = str(desc16)
     sheetname['B40'] = str(desc17)
     sheetname['B41'] = str(desc18)
     srcfile.save(filepath2)
-    # Find and replace/remove "nan"
     sheet1 = srcfile.active
     for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
         for cell in col:
             if cell.value == 'nan':
                 cell.value = ''
     srcfile.save(filepath2)
-    # Insert Logo image to Invoice
     wb = openpyxl.load_workbook(filepath2)
     ws = wb['Sheet1']
     img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
-    img.anchor = 'A3' # Or whatever cell location you want to use.
+    img.anchor = 'A3'
     ws.add_image(img)
     img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
     img1.anchor = 'G47'
@@ -103,9 +96,8 @@ def gch():
 def d_o():
     global filepath1
     filepath2 = add_prefix_to_last_word(filepath1, "INV_")
-    shutil.copyfile('/home/user/Templates/INV_.xlsx', filepath2) # Copy Invoice template as destination xlsx
+    shutil.copyfile('/home/user/Templates/INV_.xlsx', filepath2)
     df = pd.read_excel(filepath1, sheet_name='Sheet1', header=None)
-    # Read(copy) Work Order
     inv_no = df.loc[9,7]
     date_ = df.loc[11,7]
     po_no = df.loc[13,7]
@@ -139,7 +131,6 @@ def d_o():
     desc18 = df.loc[40,1]
     srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=False)
     sheetname = srcfile['Sheet1']
-    # Write(paste) to Invoice
     sheetname['H11'] = str(inv_no)
     sheetname['H13'] = str(date_)
     sheetname['H15'] = str(po_no)
@@ -164,25 +155,23 @@ def d_o():
     sheetname['B33'] = str(desc10)
     sheetname['B34'] = str(desc11)
     sheetname['B35'] = str(desc12)
-    sheetname['B36'] = str(desc13) # Site address
+    sheetname['B36'] = str(desc13)
     sheetname['B37'] = str(desc14)
     sheetname['B38'] = str(desc15)
     sheetname['B39'] = str(desc16)
     sheetname['B40'] = str(desc17)
     sheetname['B41'] = str(desc18)
     srcfile.save(filepath2)
-    # Find and replace/remove "nan"
     sheet1 = srcfile.active
     for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
         for cell in col:
             if cell.value == 'nan':
                 cell.value = ''
     srcfile.save(filepath2)
-    # Insert Logo image to Invoice
     wb = openpyxl.load_workbook(filepath2)
     ws = wb['Sheet1']
     img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
-    img.anchor = 'A3' # Or whatever cell location you want to use.
+    img.anchor = 'A3'
     ws.add_image(img)
     img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
     img1.anchor = 'G47'
@@ -195,9 +184,8 @@ def d_o():
 def dm():
     global filepath1
     filepath2 = add_prefix_to_last_word(filepath1, "INV_")
-    shutil.copyfile('/home/user/Templates/INV_.xlsx', filepath2) # Copy Invoice template as destination xlsx
+    shutil.copyfile('/home/user/Templates/INV_.xlsx', filepath2)
     df = pd.read_excel(filepath1, sheet_name='Sheet1', header=None)
-    # Read(copy) Work Order
     no_ = df.loc[10,8]
     date_ = df.loc[12,8]
     work_no = df.loc[14,8]
@@ -224,13 +212,12 @@ def dm():
     desc19 = df.loc[44,1]
     srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=True)
     sheetname = srcfile['Sheet1']
-    # Write(paste) to Invoice
     sheetname['I12'] = str(date_)
-    sheetname['B27'] = str(date_)[2:] # Date (Remove first 2 characters)
+    sheetname['B27'] = str(date_)[2:]
     sheetname['I14'] = str(no_)
-    sheetname['C27'] = str(no_)[2:] # WO No (Remove first 2 characters)
-    sheetname['D27'] = str(job_no)[2:] # Helpdesk Job No (Remove first 2 characters)
-    sheetname['G27'] = str(work_no)[2:] # City WO (Remove first 2 characters)
+    sheetname['C27'] = str(no_)[2:]
+    sheetname['D27'] = str(job_no)[2:]
+    sheetname['G27'] = str(work_no)[2:]
     sheetname['B30'] = str(desc0)
     sheetname['B31'] = str(desc1)
     sheetname['B32'] = str(desc2)
@@ -244,26 +231,24 @@ def dm():
     sheetname['B40'] = str(desc10)
     sheetname['B41'] = str(desc11)
     sheetname['B42'] = str(desc12)
-    sheetname['B43'] = str(desc13) # Site address
+    sheetname['B43'] = str(desc13)
     sheetname['B44'] = str(desc14)
     sheetname['B45'] = str(desc15)
     sheetname['B46'] = str(desc16)
     sheetname['B47'] = str(desc17)
-    sheetname['B48'] = str(desc18) # Contact
+    sheetname['B48'] = str(desc18)
     sheetname['B49'] = str(desc19)
     srcfile.save(filepath2)
-    # Find and replace/remove "nan"
     sheet1 = srcfile.active
     for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
         for cell in col:
             if cell.value == 'nan':
                 cell.value = ''
     srcfile.save(filepath2)
-    # Insert Logo image to Invoice
     wb = openpyxl.load_workbook(filepath2)
     ws = wb['Sheet1']
     img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
-    img.anchor = 'A3' # Or whatever cell location you want to use.
+    img.anchor = 'A3'
     ws.add_image(img)
     img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
     img1.anchor = 'G47'
@@ -275,7 +260,7 @@ def dm():
 
 def open_gui():
     global filepath1
-    root = tk.Tk()
+    root = tkinter.Tk()
     root.title("Demax Invoice Generator")
 
     def gch_button_click():
@@ -290,16 +275,16 @@ def open_gui():
     def open_folder_button_click():
         open_folder()
 
-    gch_button = tk.Button(root, text="GCH", command=gch_button_click)
+    gch_button = tkinter.Button(root, text="GCH", command=gch_button_click)
     gch_button.pack()
 
-    d_o_button = tk.Button(root, text="D.O", command=d_o_button_click)
+    d_o_button = tkinter.Button(root, text="D.O", command=d_o_button_click)
     d_o_button.pack()
 
-    dm_button = tk.Button(root, text="DM", command=dm_button_click)
+    dm_button = tkinter.Button(root, text="DM", command=dm_button_click)
     dm_button.pack()
 
-    open_folder_button = tk.Button(root, text="Open Folder", command=open_folder_button_click)
+    open_folder_button = tkinter.Button(root, text="Open Folder", command=open_folder_button_click)
     open_folder_button.pack()
 
     root.mainloop()
