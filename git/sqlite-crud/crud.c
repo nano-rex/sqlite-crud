@@ -1,150 +1,279 @@
-#!/bin/python3
+#include <iostream>
+#include <sqlite3.h>
 
-import sqlite3
+using namespace std;
 
-####################################################
-def create():
-	conn = sqlite3.connect('data.db')
-	print("Opened database successfully");
-	conn.execute('''
-		CREATE TABLE Users
-		(ID      INT   PRIMARY KEY  NOT NULL,
-		 NAME    TEXT               NOT NULL,
-		 AGE     INT                NOT NULL,
-		 GENDER  TEXT,
-		 SALARY  INT);
-	''')
-	print("Table created successfully");
-
-####################################################
-# FOR CREATING RECORDS FUNCTION DEFINITION
-def insert():
-#	try:
-		con = sqlite3.connect("data.db")
-		cursor = con.cursor()
-		while (True):
-			idd = int(input("Enter ID: "))
-			name = input("Enter Name: ")
-			age = int(input("Enter Age: "))
-			gender = input("Enter your Gender: ")
-			salary = int(input("Enter your Salary: "))
-			query = "INSERT into USERS(ID,NAME,AGE,GENDER,SALARY) VALUES (?,?,?,?,?);"
-			data = (idd,name,age,gender,salary)
-			cursor.execute(query, data)
-			con.commit()
-			if(cursor.execute(query,data)):
-				print("Data Inserted Successfully")
-			else:
-				print("Data not Inserted")
-#			ch = input("Do You want to Add More Records(Y/N): ")
-#			if ch == "N" or ch == "n":
-#				cursor.close()
-#				break
-#			else:
-#				pass
-#	except:
-#		print("Error in Record Creation\n")
-
-####################################################
-# FOR READING ONE RECORD FUNCTION DEFINITION
-def read_one():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    ids = int(input("Enter Your ID: "))
-    query = "SELECT * from USERS WHERE id = ?"
-    result = cursor.execute(query, (ids,))
-    if (result):
-        for i in result:
-            print(f"Name is: {i[1]}")
-            print(f"Age is: {i[2]}")
-            print(f"Salary is: {i[4]}")
-    else:
-        print("Roll Number Does not Exist")
-        cursor.close()
-
-####################################################
-# FOR READING ALL RECORDS FUNCTION DEFINITION
-def read_all():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    query = "SELECT * from USERS"
-    result = cursor.execute(query)
-    if (result):
-        print("\n&lt;===Available Records===&gt;")
-        for i in result:
-            print(f"Name is : {i[1]}")
-            print(f"Age is : {i[2]}")
-            print(f"Salary is : {i[4]}\n")
-    else:
-        pass
+void create() {
+    sqlite3 *db;
+    int rc = sqlite3_open("data.db", &db);
+    if (rc) {
+        cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    cout << "Opened database successfully" << endl;
     
-####################################################
-# FOR UPDATING RECORDS FUNCTION DEFINITION
-def update():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    name = input("Enter Name: ")
-    age = int(input("Enter Age: "))
-    gender = input("Enter Gender: ")
-    salary = int(input("Enter Salary: "))
-    data = (name, age, gender, salary, idd,)
-    query = "UPDATE USERS set name = ?, age = ?, gender = ?, salary = ? WHERE id = ?"
-    result = cursor.execute(query, data)
-    con.commit()
-    cursor.close()
-    if (result):
-        print("Records Updated")
-    else:
-        print("Something Error in Updation")
+    const char *sql = "CREATE TABLE Users (ID INT PRIMARY KEY NOT NULL, NAME TEXT NOT NULL, AGE INT NOT NULL, GENDER TEXT, SALARY INT);";
+    rc = sqlite3_exec(db, sql, 0, 0, 0);
+    if (rc != SQLITE_OK) {
+        cout << "SQL error: " << sqlite3_errmsg(db) << endl;
+    } else {
+        cout << "Table created successfully" << endl;
+    }
+    
+    sqlite3_close(db);
+}
 
-####################################################
-# FOR DELETING RECORDS FUNCTION DEFINITION
-def delete():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    query = "DELETE from USERS where ID = ?"
-    result = cursor.execute(query, (idd,))
-    con.commit()
-    cursor.close()
-    if (result):
-        print("One record Deleted")
-    else:
-        print("Something Error in Deletion")
+void insert() {
+    sqlite3 *db;
+    int rc = sqlite3_open("data.db", &db);
+    if (rc) {
+        cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    sqlite3_stmt *stmt;
+    const char *sql = "INSERT INTO USERS (ID, NAME, AGE, GENDER, SALARY) VALUES (?, ?, ?, ?, ?);";
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        cout << "SQL error: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    while (true) {
+        int idd, age, salary;
+        string name, gender;
+        
+        cout << "Enter ID: ";
+        cin >> idd;
+        cout << "Enter Name: ";
+        cin >> name;
+        cout << "Enter Age: ";
+        cin >> age;
+        cout << "Enter your Gender: ";
+        cin >> gender;
+        cout << "Enter your Salary: ";
+        cin >> salary;
+        
+        sqlite3_bind_int(stmt, 1, idd);
+        sqlite3_bind_text(stmt, 2, name.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 3, age);
+        sqlite3_bind_text(stmt, 4, gender.c_str(), -1, SQLITE_STATIC);
+        sqlite3_bind_int(stmt, 5, salary);
+        
+        rc = sqlite3_step(stmt);
+        if (rc != SQLITE_DONE) {
+            cout << "Data not Inserted" << endl;
+        } else {
+            cout << "Data Inserted Successfully" << endl;
+        }
+        
+        sqlite3_reset(stmt);
+        
+        char ch;
+        cout << "Do You want to Add More Records(Y/N): ";
+        cin >> ch;
+        if (ch == 'N' || ch == 'n') {
+            break;
+        }
+    }
+    
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
 
-####################################################
-# MAIN BLOCK
-try:
-    while (True):
-        print("1). Insert Records: ")
-        print("2). Read Records: ")
-        print("3). Update Records: ")
-        print("4). Delete Records: ")
-        print("5). Exit")
-        ch = int(input("Enter Your Choice: "))
-        if (ch == 1):
-            insert()
-        elif (ch == 2):
-            print("1). Read Single Record")
-            print("2). Read All Records")
-            choice = int(input("Enter Your Choice: "))
-            if (choice == 1):
-                read_one()
-            elif (choice == 2):
-                read_all()
-            else:
-                print("Wrong Choice Entered")
-        elif (ch == 3):
-            update()
-        elif (ch == 4):
-            delete()
-        elif (ch == 5):
-            break
-        else:
-            print("Enter Correct Choice")
-except:
-    print("Database Error")
+void read_one() {
+    sqlite3 *db;
+    int rc = sqlite3_open("data.db", &db);
+    if (rc) {
+        cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT * FROM USERS WHERE id = ?;";
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        cout << "SQL error: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    int ids;
+    cout << "Enter Your ID: ";
+    cin >> ids;
+    
+    sqlite3_bind_int(stmt, 1, ids);
+    
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW) {
+        cout << "Name is: " << sqlite3_column_text(stmt, 1) << endl;
+        cout << "Age is: " << sqlite3_column_int(stmt, 2) << endl;
+        cout << "Salary is: " << sqlite3_column_int(stmt, 4) << endl;
+    } else {
+        cout << "Record Does not Exist" << endl;
+    }
+    
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
 
-####################################################
-#END
+void read_all() {
+    sqlite3 *db;
+    int rc = sqlite3_open("data.db", &db);
+    if (rc) {
+        cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    sqlite3_stmt *stmt;
+    const char *sql = "SELECT * FROM USERS;";
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        cout << "SQL error: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    rc = sqlite3_step(stmt);
+    if (rc == SQLITE_ROW) {
+        cout << "\n<=== Available Records ===>" << endl;
+        while (rc == SQLITE_ROW) {
+            cout << "Name is: " << sqlite3_column_text(stmt, 1) << endl;
+            cout << "Age is: " << sqlite3_column_int(stmt, 2) << endl;
+            cout << "Salary is: " << sqlite3_column_int(stmt, 4) << endl;
+            cout << endl;
+            rc = sqlite3_step(stmt);
+        }
+    }
+    
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+void update() {
+    sqlite3 *db;
+    int rc = sqlite3_open("data.db", &db);
+    if (rc) {
+        cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    sqlite3_stmt *stmt;
+    const char *sql = "UPDATE USERS SET NAME = ?, AGE = ?, GENDER = ?, SALARY = ? WHERE ID = ?;";
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        cout << "SQL error: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    int idd, age, salary;
+    string name, gender;
+    
+    cout << "Enter ID: ";
+    cin >> idd;
+    cout << "Enter Name: ";
+    cin >> name;
+    cout << "Enter Age: ";
+    cin >> age;
+    cout << "Enter Gender: ";
+    cin >> gender;
+    cout << "Enter Salary: ";
+    cin >> salary;
+    
+    sqlite3_bind_text(stmt, 1, name.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 2, age);
+    sqlite3_bind_text(stmt, 3, gender.c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 4, salary);
+    sqlite3_bind_int(stmt, 5, idd);
+    
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        cout << "Something Error in Updation" << endl;
+    } else {
+        cout << "Records Updated" << endl;
+    }
+    
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+void deleteRecord() {
+    sqlite3 *db;
+    int rc = sqlite3_open("data.db", &db);
+    if (rc) {
+        cout << "Can't open database: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    sqlite3_stmt *stmt;
+    const char *sql = "DELETE FROM USERS WHERE ID = ?;";
+    rc = sqlite3_prepare_v2(db, sql, -1, &stmt, 0);
+    if (rc != SQLITE_OK) {
+        cout << "SQL error: " << sqlite3_errmsg(db) << endl;
+        return;
+    }
+    
+    int idd;
+    cout << "Enter ID: ";
+    cin >> idd;
+    
+    sqlite3_bind_int(stmt, 1, idd);
+    
+    rc = sqlite3_step(stmt);
+    if (rc != SQLITE_DONE) {
+        cout << "Something Error in Deletion" << endl;
+    } else {
+        cout << "One record Deleted" << endl;
+    }
+    
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+}
+
+int main() {
+    while (true) {
+        cout << "1). Insert Records" << endl;
+        cout << "2). Read Records" << endl;
+        cout << "3). Update Records" << endl;
+        cout << "4). Delete Records" << endl;
+        cout << "5). Exit" << endl;
+        cout << "Enter Your Choice: ";
+        
+        int ch;
+        cin >> ch;
+        
+        switch (ch) {
+            case 1:
+                insert();
+                break;
+            case 2:
+                cout << "1). Read Single Record" << endl;
+                cout << "2). Read All Records" << endl;
+                cout << "Enter Your Choice: ";
+                
+                int choice;
+                cin >> choice;
+                
+                if (choice == 1) {
+                    read_one();
+                } else if (choice == 2) {
+                    read_all();
+                } else {
+                    cout << "Wrong Choice Entered" << endl;
+                }
+                
+                break;
+            case 3:
+                update();
+                break;
+            case 4:
+                deleteRecord();
+                break;
+            case 5:
+                return 0;
+            default:
+                cout << "Enter Correct Choice" << endl;
+                break;
+        }
+    }
+    
+    return 0;
+}
