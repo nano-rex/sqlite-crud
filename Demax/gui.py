@@ -263,6 +263,9 @@ def open_gui():
     root = tkinter.Tk()
     root.title("Demax Invoice Generator")
 
+    def open_folder_button_click():
+        open_folder()
+
     def gch_button_click():
         gch()
 
@@ -272,8 +275,8 @@ def open_gui():
     def dm_button_click():
         dm()
 
-    def open_folder_button_click():
-        open_folder()
+    open_folder_button = tkinter.Button(root, text="Open Folder", command=open_folder_button_click)
+    open_folder_button.pack()
 
     gch_button = tkinter.Button(root, text="GCH", command=gch_button_click)
     gch_button.pack()
@@ -283,9 +286,6 @@ def open_gui():
 
     dm_button = tkinter.Button(root, text="DM", command=dm_button_click)
     dm_button.pack()
-
-    open_folder_button = tkinter.Button(root, text="Open Folder", command=open_folder_button_click)
-    open_folder_button.pack()
 
     root.mainloop()
 
