@@ -47,12 +47,6 @@ def open_text_file():
         # Call the xlsx() function to perform the desired operations
         xlsx()
 
-def xlsx(): 
-     shutil.copyfile('/home/user/Templates/INV_GCH.xlsx', new_filepath) # Copy Invoice template as destination xlsx
-
-     df = pd.read_excel(filepath, sheet_name='Sheet1', header=None)
-     # Rest of the code...
-
 # open file button
 open_button = ttk.Button(
     root,
