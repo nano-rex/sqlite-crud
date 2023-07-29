@@ -228,6 +228,7 @@ ws.add_image(img2)
 wb.save(filepath2)
 
 # User input for function selection
+print("Select:")
 option = input("Select an option (1: gch, 2: d_o, 3: dm): ")
 
 if option == "1":
