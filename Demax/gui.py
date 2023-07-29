@@ -274,6 +274,10 @@ def open_gui():
     global filepath1
     root = tk.Tk()
     root.title("Demax Invoice Generator")
+    root.geometry('550x250')
+
+    def open_folder_button_click():
+        open_folder()
 
     def gch_button_click():
         gch()
@@ -284,20 +288,17 @@ def open_gui():
     def dm_button_click():
         dm()
 
-    def open_folder_button_click():
-        open_folder()
-
-    gch_button = tk.Button(root, text="GCH", command=gch_button_click)
-    gch_button.pack()
-
-    d_o_button = tk.Button(root, text="D.O", command=d_o_button_click)
-    d_o_button.pack()
-
-    dm_button = tk.Button(root, text="DM", command=dm_button_click)
-    dm_button.pack()
-
     open_folder_button = tk.Button(root, text="Open Folder", command=open_folder_button_click)
     open_folder_button.pack()
+
+    gch_button = tk.Button(root, text="Generate Invoice for Giant", command=gch_button_click)
+    gch_button.pack()
+
+    d_o_button = tk.Button(root, text="Generate Invoice", command=d_o_button_click)
+    d_o_button.pack()
+
+    dm_button = tk.Button(root, text="Generate Invoice for City Facilities", command=dm_button_click)
+    dm_button.pack()
 
     root.mainloop()
 
