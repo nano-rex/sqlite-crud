@@ -12,7 +12,7 @@ public class InvoiceGenerator {
         openGui();
     }
 
-    private static void addPrefixToLastWord(String text, String prefix) {
+    private static String addPrefixToLastWord(String text, String prefix) {
         String[] words = text.split("/");
         String lastWord = words[words.length - 1];
         String newLastWord = prefix + lastWord;
