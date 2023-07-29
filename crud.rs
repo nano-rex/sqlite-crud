@@ -1,150 +1,149 @@
-#!/bin/python3
+use std::io;
 
-import sqlite3
+fn create() {
+    let conn = sqlite::open("data.db").unwrap();
+    conn.execute(
+        "
+        CREATE TABLE Users (
+            ID      INTEGER PRIMARY KEY NOT NULL,
+            NAME    TEXT NOT NULL,
+            AGE     INTEGER NOT NULL,
+            GENDER  TEXT,
+            SALARY  INTEGER
+        )
+        "
+    ).unwrap();
+    println!("Table created successfully");
+}
 
-####################################################
-def create():
-	conn = sqlite3.connect('data.db')
-	print("Opened database successfully");
-	conn.execute('''
-		CREATE TABLE Users
-		(ID      INT   PRIMARY KEY  NOT NULL,
-		 NAME    TEXT               NOT NULL,
-		 AGE     INT                NOT NULL,
-		 GENDER  TEXT,
-		 SALARY  INT);
-	''')
-	print("Table created successfully");
+fn insert() {
+    let conn = sqlite::open("data.db").unwrap();
+    let mut stmt = conn.prepare(
+        "
+        INSERT INTO USERS (ID, NAME, AGE, GENDER, SALARY)
+        VALUES (?, ?, ?, ?, ?)
+        "
+    ).unwrap();
+    loop {
+        let id: i32 = input("Enter ID: ");
+        let name: String = input("Enter Name: ");
+        let age: i32 = input("Enter Age: ");
+        let gender: String = input("Enter your Gender: ");
+        let salary: i32 = input("Enter your Salary: ");
+        stmt.execute(params![id, name, age, gender, salary]).unwrap();
+        println!("Data Inserted Successfully");
+        let ch: String = input("Do You want to Add More Records(Y/N): ");
+        if ch == "N" || ch == "n" {
+            break;
+        }
+    }
+}
 
-####################################################
-# FOR CREATING RECORDS FUNCTION DEFINITION
-def insert():
-#	try:
-		con = sqlite3.connect("data.db")
-		cursor = con.cursor()
-		while (True):
-			idd = int(input("Enter ID: "))
-			name = input("Enter Name: ")
-			age = int(input("Enter Age: "))
-			gender = input("Enter your Gender: ")
-			salary = int(input("Enter your Salary: "))
-			query = "INSERT into USERS(ID,NAME,AGE,GENDER,SALARY) VALUES (?,?,?,?,?);"
-			data = (idd,name,age,gender,salary)
-			cursor.execute(query, data)
-			con.commit()
-			if(cursor.execute(query,data)):
-				print("Data Inserted Successfully")
-			else:
-				print("Data not Inserted")
-#			ch = input("Do You want to Add More Records(Y/N): ")
-#			if ch == "N" or ch == "n":
-#				cursor.close()
-#				break
-#			else:
-#				pass
-#	except:
-#		print("Error in Record Creation\n")
+fn read_one() {
+    let conn = sqlite::open("data.db").unwrap();
+    let mut stmt = conn.prepare(
+        "
+        SELECT * FROM USERS WHERE id = ?
+        "
+    ).unwrap();
+    let id: i32 = input("Enter Your ID: ");
+    let mut rows = stmt.query(params![id]).unwrap();
+    if let Some(row) = rows.next().unwrap() {
+        let name: String = row.get(1).unwrap();
+        let age: i32 = row.get(2).unwrap();
+        let salary: i32 = row.get(4).unwrap();
+        println!("Name is: {}", name);
+        println!("Age is: {}", age);
+        println!("Salary is: {}", salary);
+    } else {
+        println!("Roll Number Does not Exist");
+    }
+}
 
-####################################################
-# FOR READING ONE RECORD FUNCTION DEFINITION
-def read_one():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    ids = int(input("Enter Your ID: "))
-    query = "SELECT * from USERS WHERE id = ?"
-    result = cursor.execute(query, (ids,))
-    if (result):
-        for i in result:
-            print(f"Name is: {i[1]}")
-            print(f"Age is: {i[2]}")
-            print(f"Salary is: {i[4]}")
-    else:
-        print("Roll Number Does not Exist")
-        cursor.close()
+fn read_all() {
+    let conn = sqlite::open("data.db").unwrap();
+    let mut stmt = conn.prepare(
+        "
+        SELECT * FROM USERS
+        "
+    ).unwrap();
+    let rows = stmt.query_map(params![], |row| {
+        let name: String = row.get(1).unwrap();
+        let age: i32 = row.get(2).unwrap();
+        let salary: i32 = row.get(4).unwrap();
+        println!("Name is: {}", name);
+        println!("Age is: {}", age);
+        println!("Salary is: {}", salary);
+    }).unwrap();
+    if rows.count() == 0 {
+        println!("No Records Found");
+    }
+}
 
-####################################################
-# FOR READING ALL RECORDS FUNCTION DEFINITION
-def read_all():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    query = "SELECT * from USERS"
-    result = cursor.execute(query)
-    if (result):
-        print("\n&lt;===Available Records===&gt;")
-        for i in result:
-            print(f"Name is : {i[1]}")
-            print(f"Age is : {i[2]}")
-            print(f"Salary is : {i[4]}\n")
-    else:
-        pass
-    
-####################################################
-# FOR UPDATING RECORDS FUNCTION DEFINITION
-def update():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    name = input("Enter Name: ")
-    age = int(input("Enter Age: "))
-    gender = input("Enter Gender: ")
-    salary = int(input("Enter Salary: "))
-    data = (name, age, gender, salary, idd,)
-    query = "UPDATE USERS set name = ?, age = ?, gender = ?, salary = ? WHERE id = ?"
-    result = cursor.execute(query, data)
-    con.commit()
-    cursor.close()
-    if (result):
-        print("Records Updated")
-    else:
-        print("Something Error in Updation")
+fn update() {
+    let conn = sqlite::open("data.db").unwrap();
+    let mut stmt = conn.prepare(
+        "
+        UPDATE USERS SET name = ?, age = ?, gender = ?, salary = ? WHERE id = ?
+        "
+    ).unwrap();
+    let id: i32 = input("Enter ID: ");
+    let name: String = input("Enter Name: ");
+    let age: i32 = input("Enter Age: ");
+    let gender: String = input("Enter Gender: ");
+    let salary: i32 = input("Enter Salary: ");
+    stmt.execute(params![name, age, gender, salary, id]).unwrap();
+    println!("Records Updated");
+}
 
-####################################################
-# FOR DELETING RECORDS FUNCTION DEFINITION
-def delete():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    query = "DELETE from USERS where ID = ?"
-    result = cursor.execute(query, (idd,))
-    con.commit()
-    cursor.close()
-    if (result):
-        print("One record Deleted")
-    else:
-        print("Something Error in Deletion")
+fn delete() {
+    let conn = sqlite::open("data.db").unwrap();
+    let mut stmt = conn.prepare(
+        "
+        DELETE FROM USERS WHERE ID = ?
+        "
+    ).unwrap();
+    let id: i32 = input("Enter ID: ");
+    stmt.execute(params![id]).unwrap();
+    println!("One record Deleted");
+}
 
-####################################################
-# MAIN BLOCK
-try:
-    while (True):
-        print("1). Insert Records: ")
-        print("2). Read Records: ")
-        print("3). Update Records: ")
-        print("4). Delete Records: ")
-        print("5). Exit")
-        ch = int(input("Enter Your Choice: "))
-        if (ch == 1):
-            insert()
-        elif (ch == 2):
-            print("1). Read Single Record")
-            print("2). Read All Records")
-            choice = int(input("Enter Your Choice: "))
-            if (choice == 1):
-                read_one()
-            elif (choice == 2):
-                read_all()
-            else:
-                print("Wrong Choice Entered")
-        elif (ch == 3):
-            update()
-        elif (ch == 4):
-            delete()
-        elif (ch == 5):
-            break
-        else:
-            print("Enter Correct Choice")
-except:
-    print("Database Error")
+fn main() {
+    loop {
+        println!("1). Insert Records");
+        println!("2). Read Records");
+        println!("3). Update Records");
+        println!("4). Delete Records");
+        println!("5). Exit");
+        let ch: i32 = input("Enter Your Choice: ");
+        match ch {
+            1 => insert(),
+            2 => {
+                println!("1). Read Single Record");
+                println!("2). Read All Records");
+                let choice: i32 = input("Enter Your Choice: ");
+                match choice {
+                    1 => read_one(),
+                    2 => read_all(),
+                    _ => println!("Wrong Choice Entered"),
+                }
+            },
+            3 => update(),
+            4 => delete(),
+            5 => break,
+            _ => println!("Enter Correct Choice"),
+        }
+    }
+}
 
-####################################################
-#END
+fn input<T: std::str::FromStr>(prompt: &str) -> T {
+    loop {
+        println!("{}", prompt);
+        let mut input = String::new();
+        io::stdin().read_line(&mut input).unwrap();
+        match input.trim().parse() {
+            Ok(value) => return value,
+            Err(_) => println!("Invalid input. Please try again."),
+        }
+    }
+}
