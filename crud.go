@@ -1,150 +1,225 @@
-#!/bin/python3
+package main
 
-import sqlite3
+import (
+	"database/sql"
+	"fmt"
+	"log"
 
-####################################################
-def create():
-	conn = sqlite3.connect('data.db')
-	print("Opened database successfully");
-	conn.execute('''
-		CREATE TABLE Users
-		(ID      INT   PRIMARY KEY  NOT NULL,
-		 NAME    TEXT               NOT NULL,
-		 AGE     INT                NOT NULL,
-		 GENDER  TEXT,
-		 SALARY  INT);
-	''')
-	print("Table created successfully");
+	_ "github.com/mattn/go-sqlite3"
+)
 
-####################################################
-# FOR CREATING RECORDS FUNCTION DEFINITION
-def insert():
-#	try:
-		con = sqlite3.connect("data.db")
-		cursor = con.cursor()
-		while (True):
-			idd = int(input("Enter ID: "))
-			name = input("Enter Name: ")
-			age = int(input("Enter Age: "))
-			gender = input("Enter your Gender: ")
-			salary = int(input("Enter your Salary: "))
-			query = "INSERT into USERS(ID,NAME,AGE,GENDER,SALARY) VALUES (?,?,?,?,?);"
-			data = (idd,name,age,gender,salary)
-			cursor.execute(query, data)
-			con.commit()
-			if(cursor.execute(query,data)):
-				print("Data Inserted Successfully")
-			else:
-				print("Data not Inserted")
-#			ch = input("Do You want to Add More Records(Y/N): ")
-#			if ch == "N" or ch == "n":
-#				cursor.close()
-#				break
-#			else:
-#				pass
-#	except:
-#		print("Error in Record Creation\n")
+func create() {
+	db, err := sql.Open("sqlite3", "data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-####################################################
-# FOR READING ONE RECORD FUNCTION DEFINITION
-def read_one():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    ids = int(input("Enter Your ID: "))
-    query = "SELECT * from USERS WHERE id = ?"
-    result = cursor.execute(query, (ids,))
-    if (result):
-        for i in result:
-            print(f"Name is: {i[1]}")
-            print(f"Age is: {i[2]}")
-            print(f"Salary is: {i[4]}")
-    else:
-        print("Roll Number Does not Exist")
-        cursor.close()
+	createTable := `
+		CREATE TABLE IF NOT EXISTS Users (
+			ID      INTEGER PRIMARY KEY,
+			NAME    TEXT NOT NULL,
+			AGE     INTEGER NOT NULL,
+			GENDER  TEXT,
+			SALARY  INTEGER
+		);
+	`
+	_, err = db.Exec(createTable)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-####################################################
-# FOR READING ALL RECORDS FUNCTION DEFINITION
-def read_all():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    query = "SELECT * from USERS"
-    result = cursor.execute(query)
-    if (result):
-        print("\n&lt;===Available Records===&gt;")
-        for i in result:
-            print(f"Name is : {i[1]}")
-            print(f"Age is : {i[2]}")
-            print(f"Salary is : {i[4]}\n")
-    else:
-        pass
-    
-####################################################
-# FOR UPDATING RECORDS FUNCTION DEFINITION
-def update():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    name = input("Enter Name: ")
-    age = int(input("Enter Age: "))
-    gender = input("Enter Gender: ")
-    salary = int(input("Enter Salary: "))
-    data = (name, age, gender, salary, idd,)
-    query = "UPDATE USERS set name = ?, age = ?, gender = ?, salary = ? WHERE id = ?"
-    result = cursor.execute(query, data)
-    con.commit()
-    cursor.close()
-    if (result):
-        print("Records Updated")
-    else:
-        print("Something Error in Updation")
+	fmt.Println("Table created successfully")
+}
 
-####################################################
-# FOR DELETING RECORDS FUNCTION DEFINITION
-def delete():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    query = "DELETE from USERS where ID = ?"
-    result = cursor.execute(query, (idd,))
-    con.commit()
-    cursor.close()
-    if (result):
-        print("One record Deleted")
-    else:
-        print("Something Error in Deletion")
+func insert() {
+	db, err := sql.Open("sqlite3", "data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
 
-####################################################
-# MAIN BLOCK
-try:
-    while (True):
-        print("1). Insert Records: ")
-        print("2). Read Records: ")
-        print("3). Update Records: ")
-        print("4). Delete Records: ")
-        print("5). Exit")
-        ch = int(input("Enter Your Choice: "))
-        if (ch == 1):
-            insert()
-        elif (ch == 2):
-            print("1). Read Single Record")
-            print("2). Read All Records")
-            choice = int(input("Enter Your Choice: "))
-            if (choice == 1):
-                read_one()
-            elif (choice == 2):
-                read_all()
-            else:
-                print("Wrong Choice Entered")
-        elif (ch == 3):
-            update()
-        elif (ch == 4):
-            delete()
-        elif (ch == 5):
-            break
-        else:
-            print("Enter Correct Choice")
-except:
-    print("Database Error")
+	stmt, err := db.Prepare("INSERT INTO Users(ID, NAME, AGE, GENDER, SALARY) VALUES (?, ?, ?, ?, ?)")
+	if err != nil {
+		log.Fatal(err)
+	}
 
-####################################################
-#END
+	var id, age, salary int
+	var name, gender string
+
+	fmt.Print("Enter ID: ")
+	fmt.Scan(&id)
+	fmt.Print("Enter Name: ")
+	fmt.Scan(&name)
+	fmt.Print("Enter Age: ")
+	fmt.Scan(&age)
+	fmt.Print("Enter Gender: ")
+	fmt.Scan(&gender)
+	fmt.Print("Enter Salary: ")
+	fmt.Scan(&salary)
+
+	_, err = stmt.Exec(id, name, age, gender, salary)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Data Inserted Successfully")
+}
+
+func readOne() {
+	db, err := sql.Open("sqlite3", "data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	var id int
+	fmt.Print("Enter Your ID: ")
+	fmt.Scan(&id)
+
+	row := db.QueryRow("SELECT * FROM Users WHERE ID = ?", id)
+
+	var name, gender string
+	var age, salary int
+
+	err = row.Scan(&id, &name, &age, &gender, &salary)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("Name is: %s\n", name)
+	fmt.Printf("Age is: %d\n", age)
+	fmt.Printf("Salary is: %d\n", salary)
+}
+
+func readAll() {
+	db, err := sql.Open("sqlite3", "data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query("SELECT * FROM Users")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer rows.Close()
+
+	fmt.Println("\n<=== Available Records ===>")
+	for rows.Next() {
+		var id, age, salary int
+		var name, gender string
+
+		err = rows.Scan(&id, &name, &age, &gender, &salary)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Printf("Name is: %s\n", name)
+		fmt.Printf("Age is: %d\n", age)
+		fmt.Printf("Salary is: %d\n", salary)
+	}
+}
+
+func update() {
+	db, err := sql.Open("sqlite3", "data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("UPDATE Users SET NAME = ?, AGE = ?, GENDER = ?, SALARY = ? WHERE ID = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var id, age, salary int
+	var name, gender string
+
+	fmt.Print("Enter ID: ")
+	fmt.Scan(&id)
+	fmt.Print("Enter Name: ")
+	fmt.Scan(&name)
+	fmt.Print("Enter Age: ")
+	fmt.Scan(&age)
+	fmt.Print("Enter Gender: ")
+	fmt.Scan(&gender)
+	fmt.Print("Enter Salary: ")
+	fmt.Scan(&salary)
+
+	_, err = stmt.Exec(name, age, gender, salary, id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Records Updated")
+}
+
+func delete() {
+	db, err := sql.Open("sqlite3", "data.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	stmt, err := db.Prepare("DELETE FROM Users WHERE ID = ?")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	var id int
+	fmt.Print("Enter ID: ")
+	fmt.Scan(&id)
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("One record Deleted")
+}
+
+func main() {
+	create()
+
+	for {
+		fmt.Println("1). Insert Records")
+		fmt.Println("2). Read Records")
+		fmt.Println("3). Update Records")
+		fmt.Println("4). Delete Records")
+		fmt.Println("5). Exit")
+
+		var ch int
+		fmt.Print("Enter Your Choice: ")
+		fmt.Scan(&ch)
+
+		switch ch {
+		case 1:
+			insert()
+		case 2:
+			fmt.Println("1). Read Single Record")
+			fmt.Println("2). Read All Records")
+
+			var choice int
+			fmt.Print("Enter Your Choice: ")
+			fmt.Scan(&choice)
+
+			switch choice {
+			case 1:
+				readOne()
+			case 2:
+				readAll()
+			default:
+				fmt.Println("Wrong Choice Entered")
+			}
+		case 3:
+			update()
+		case 4:
+			delete()
+		case 5:
+			return
+		default:
+			fmt.Println("Enter Correct Choice")
+		}
+	}
+}
