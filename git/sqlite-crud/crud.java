@@ -1,5 +1,10 @@
 import java.sql.*;
 
+/*
+https://github.com/xerial/sqlite-jdbc/releases
+java -classpath ".:sqlite-jdbc-3.42.0.0.jar" Sample.java
+*/
+
 public class CRUD {
     public static void main(String[] args) {
         try {
