@@ -37,21 +37,17 @@ def open_text_file():
            return modified_text
         text = filepath
         prefix = "INV_"
-        #new_filepath = add_prefix_to_last_word(text, prefix)
-        filepath2 = add_prefix_to_last_word(text, prefix)
-
-        # Copy the original file to the new file path
-        #shutil.copyfile(filepath, new_filepath)
+        new_filepath = add_prefix_to_last_word(filepath, prefix)
+        shutil.copyfile(filepath, new_filepath)
         
         # Update the text widget with the new file path
         text.delete('1.0', tk.END)
-        #text.insert(tk.END, new_filepath)
-        text.insert(tk.END, filepath2)
+        text.insert(tk.END, new_filepath)
 
 def xlsx(): 
-     shutil.copyfile('/home/user/Templates/INV_GCH.xlsx', filepath2) # Copy Invoice template as destination xlsx
+     shutil.copyfile('/home/user/Templates/INV_GCH.xlsx', new_filepath) # Copy Invoice template as destination xlsx
 
-     df = pd.read_excel(filepath1, sheet_name='Sheet1', header=None)
+     df = pd.read_excel(filepath, sheet_name='Sheet1', header=None)
      # Read(copy) Work Order
      inv_no = df.loc[10,7]
      date_ = df.loc[12,7]
@@ -86,7 +82,7 @@ def xlsx():
      desc18 = df.loc[39,1]
      desc19 = df.loc[40,1]
 
-     srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=False)
+     srcfile = openpyxl.load_workbook(new_filepath, read_only=False, keep_vba=False)
      sheetname = srcfile['Sheet1']
      # Write(paste) to Invoice
      sheetname['H11'] = str(inv_no)
@@ -120,7 +116,7 @@ def xlsx():
      sheetname['B40'] = str(desc17)
      sheetname['B41'] = str(desc18)
      sheetname['B42'] = str(desc19)
-     srcfile.save(filepath2)
+     srcfile.save(new_filepath)
 
      # Find and replace/remove "nan"
      sheet1 = srcfile.active
@@ -128,10 +124,10 @@ def xlsx():
        for cell in col:
          if cell.value == 'nan':
            cell.value = ''
-     srcfile.save(filepath2)
+     srcfile.save(new_filepath)
 
      # Insert Logo image to Invoice
-     wb = openpyxl.load_workbook(filepath2)
+     wb = openpyxl.load_workbook(new_filepath)
      ws = wb['Sheet1']
      img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
      img.anchor = 'A3' # Or whatever cell location you want to use.
@@ -142,8 +138,7 @@ def xlsx():
      img2 = openpyxl.drawing.image.Image('/home/user/Templates/demax_stamp_small.png')
      img2.anchor = 'H46'
      ws.add_image(img2)
-     wb.save(filepath2)
-filepath2 = xlsx(filepath2)
+     wb.save(new_filepath)
 
 # open file button
 open_button = ttk.Button(
