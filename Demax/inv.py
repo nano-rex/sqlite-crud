@@ -14,10 +14,10 @@ def add_prefix_to_last_word(text, prefix):
 	words[-1] = new_last_word # Replace the last word with the updated one 
 	modified_text = "/".join(words) # Join the words back together with forward slashes
 	return modified_text
+
 text = filepath1
 prefix = "INV_"
 filepath2 = add_prefix_to_last_word(text, prefix)
-#print(filepath2)
 
 def gch():
   shutil.copyfile('/home/user/Templates/INV_GCH.xlsx', filepath2) # Copy Invoice template as destination xlsx
@@ -72,7 +72,6 @@ def gch():
   sheetname['B39'] = str(desc16)
   sheetname['B40'] = str(desc17)
   sheetname['B41'] = str(desc18)
-  sheetname['B42'] = str(desc19)
   srcfile.save(filepath2)
 
 def d_o():
@@ -227,3 +226,15 @@ img2 = openpyxl.drawing.image.Image('/home/user/Templates/demax_stamp_small.png'
 img2.anchor = 'H46'
 ws.add_image(img2)
 wb.save(filepath2)
+
+# User input for function selection
+option = input("Select an option (1: gch, 2: d_o, 3: dm): ")
+
+if option == "1":
+  gch()
+elif option == "2":
+  d_o()
+elif option == "3":
+  dm()
+else:
+  print("Invalid option selected.")
