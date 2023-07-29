@@ -46,7 +46,6 @@ def gch():
   desc17 = df.loc[38,1]
   desc18 = df.loc[39,1]
   desc19 = df.loc[40,1]
-
   srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=False)
   sheetname = srcfile['Sheet1']
   # Write(paste) to Invoice
@@ -73,6 +72,26 @@ def gch():
   sheetname['B40'] = str(desc17)
   sheetname['B41'] = str(desc18)
   srcfile.save(filepath2)
+  # Find and replace/remove "nan"
+  sheet1 = srcfile.active
+  for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
+    for cell in col:
+      if cell.value == 'nan':
+        cell.value = ''
+  srcfile.save(filepath2)
+  # Insert Logo image to Invoice
+  wb = openpyxl.load_workbook(filepath2)
+  ws = wb['Sheet1']
+  img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
+  img.anchor = 'A3' # Or whatever cell location you want to use.
+  ws.add_image(img)
+  img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
+  img1.anchor = 'G47'
+  ws.add_image(img1)
+  img2 = openpyxl.drawing.image.Image('/home/user/Templates/demax_stamp_small.png')
+  img2.anchor = 'H46'
+  ws.add_image(img2)
+  wb.save(filepath2)
 
 def d_o():
   shutil.copyfile('/home/user/Templates/INV_.xlsx', filepath2) # Copy Invoice template as destination xlsx
@@ -109,7 +128,6 @@ def d_o():
   desc16 = df.loc[38,1]
   desc17 = df.loc[39,1]
   desc18 = df.loc[40,1]
-
   srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=False)
   sheetname = srcfile['Sheet1']
   # Write(paste) to Invoice
@@ -144,6 +162,26 @@ def d_o():
   sheetname['B40'] = str(desc17)
   sheetname['B41'] = str(desc18)
   srcfile.save(filepath2)
+  # Find and replace/remove "nan"
+  sheet1 = srcfile.active
+  for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
+    for cell in col:
+      if cell.value == 'nan':
+        cell.value = ''
+  srcfile.save(filepath2)
+  # Insert Logo image to Invoice
+  wb = openpyxl.load_workbook(filepath2)
+  ws = wb['Sheet1']
+  img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
+  img.anchor = 'A3' # Or whatever cell location you want to use.
+  ws.add_image(img)
+  img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
+  img1.anchor = 'G47'
+  ws.add_image(img1)
+  img2 = openpyxl.drawing.image.Image('/home/user/Templates/demax_stamp_small.png')
+  img2.anchor = 'H46'
+  ws.add_image(img2)
+  wb.save(filepath2)
 
 def dm():
   shutil.copyfile('/home/user/Templates/INV_.xlsx', filepath2) # Copy Invoice template as destination xlsx
@@ -173,7 +211,6 @@ def dm():
   desc17 = df.loc[42,1]
   desc18 = df.loc[43,1]
   desc19 = df.loc[44,1]
-
   srcfile = openpyxl.load_workbook(filepath2, read_only=False, keep_vba=True)
   sheetname = srcfile['Sheet1']
   # Write(paste) to Invoice
@@ -204,10 +241,29 @@ def dm():
   sheetname['B48'] = str(desc18) # Contact
   sheetname['B49'] = str(desc19)
   srcfile.save(filepath2)
+  # Find and replace/remove "nan"
+  sheet1 = srcfile.active
+  for col in sheet1.iter_cols(min_col=0, min_row=0, max_col=9, max_row=56):
+    for cell in col:
+      if cell.value == 'nan':
+        cell.value = ''
+  srcfile.save(filepath2)
+  # Insert Logo image to Invoice
+  wb = openpyxl.load_workbook(filepath2)
+  ws = wb['Sheet1']
+  img = openpyxl.drawing.image.Image('/home/user/Templates/demax_logo.png')
+  img.anchor = 'A3' # Or whatever cell location you want to use.
+  ws.add_image(img)
+  img1 = openpyxl.drawing.image.Image('/home/user/Templates/stella_signature_small.png')
+  img1.anchor = 'G47'
+  ws.add_image(img1)
+  img2 = openpyxl.drawing.image.Image('/home/user/Templates/demax_stamp_small.png')
+  img2.anchor = 'H46'
+  ws.add_image(img2)
+  wb.save(filepath2)
 
 # User input for function selection
-print("Select:")
-option = input("Select an option (1: gch, 2: d_o, 3: dm): ")
+option = input("Select an option (1: GCH, 2: D.O, 3: DM): ")
 
 if option == "1":
   gch()
