@@ -1,150 +1,148 @@
-#!/bin/python3
+local sqlite3 = require("lsqlite3")
 
-import sqlite3
+-- FOR CREATING TABLE
+function create()
+    local db = sqlite3.open("data.db")
+    print("Opened database successfully")
+    db:exec([[
+        CREATE TABLE Users
+        (ID      INT   PRIMARY KEY  NOT NULL,
+         NAME    TEXT               NOT NULL,
+         AGE     INT                NOT NULL,
+         GENDER  TEXT,
+         SALARY  INT);
+    ]])
+    print("Table created successfully")
+    db:close()
+end
 
-####################################################
-def create():
-	conn = sqlite3.connect('data.db')
-	print("Opened database successfully");
-	conn.execute('''
-		CREATE TABLE Users
-		(ID      INT   PRIMARY KEY  NOT NULL,
-		 NAME    TEXT               NOT NULL,
-		 AGE     INT                NOT NULL,
-		 GENDER  TEXT,
-		 SALARY  INT);
-	''')
-	print("Table created successfully");
+-- FOR INSERTING RECORDS
+function insert()
+    local db = sqlite3.open("data.db")
+    local stmt = db:prepare("INSERT INTO Users(ID, NAME, AGE, GENDER, SALARY) VALUES (?, ?, ?, ?, ?)")
+    while true do
+        print("Enter ID: ")
+        local id = io.read()
+        print("Enter Name: ")
+        local name = io.read()
+        print("Enter Age: ")
+        local age = io.read()
+        print("Enter Gender: ")
+        local gender = io.read()
+        print("Enter Salary: ")
+        local salary = io.read()
+        stmt:bind_values(id, name, age, gender, salary)
+        stmt:step()
+        stmt:reset()
+        print("Data Inserted Successfully")
+        print("Do You want to Add More Records(Y/N): ")
+        local choice = io.read()
+        if choice == "N" or choice == "n" then
+            break
+        end
+    end
+    stmt:finalize()
+    db:close()
+end
 
-####################################################
-# FOR CREATING RECORDS FUNCTION DEFINITION
-def insert():
-#	try:
-		con = sqlite3.connect("data.db")
-		cursor = con.cursor()
-		while (True):
-			idd = int(input("Enter ID: "))
-			name = input("Enter Name: ")
-			age = int(input("Enter Age: "))
-			gender = input("Enter your Gender: ")
-			salary = int(input("Enter your Salary: "))
-			query = "INSERT into USERS(ID,NAME,AGE,GENDER,SALARY) VALUES (?,?,?,?,?);"
-			data = (idd,name,age,gender,salary)
-			cursor.execute(query, data)
-			con.commit()
-			if(cursor.execute(query,data)):
-				print("Data Inserted Successfully")
-			else:
-				print("Data not Inserted")
-#			ch = input("Do You want to Add More Records(Y/N): ")
-#			if ch == "N" or ch == "n":
-#				cursor.close()
-#				break
-#			else:
-#				pass
-#	except:
-#		print("Error in Record Creation\n")
+-- FOR READING ONE RECORD
+function read_one()
+    local db = sqlite3.open("data.db")
+    print("Enter Your ID: ")
+    local id = io.read()
+    local stmt = db:prepare("SELECT * FROM Users WHERE ID = ?")
+    stmt:bind_values(id)
+    while stmt:step() == sqlite3.ROW do
+        print("Name is: " .. stmt:get_value(1))
+        print("Age is: " .. stmt:get_value(2))
+        print("Salary is: " .. stmt:get_value(4))
+    end
+    stmt:finalize()
+    db:close()
+end
 
-####################################################
-# FOR READING ONE RECORD FUNCTION DEFINITION
-def read_one():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    ids = int(input("Enter Your ID: "))
-    query = "SELECT * from USERS WHERE id = ?"
-    result = cursor.execute(query, (ids,))
-    if (result):
-        for i in result:
-            print(f"Name is: {i[1]}")
-            print(f"Age is: {i[2]}")
-            print(f"Salary is: {i[4]}")
-    else:
-        print("Roll Number Does not Exist")
-        cursor.close()
+-- FOR READING ALL RECORDS
+function read_all()
+    local db = sqlite3.open("data.db")
+    local stmt = db:prepare("SELECT * FROM Users")
+    while stmt:step() == sqlite3.ROW do
+        print("Name is: " .. stmt:get_value(1))
+        print("Age is: " .. stmt:get_value(2))
+        print("Salary is: " .. stmt:get_value(4))
+    end
+    stmt:finalize()
+    db:close()
+end
 
-####################################################
-# FOR READING ALL RECORDS FUNCTION DEFINITION
-def read_all():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    query = "SELECT * from USERS"
-    result = cursor.execute(query)
-    if (result):
-        print("\n&lt;===Available Records===&gt;")
-        for i in result:
-            print(f"Name is : {i[1]}")
-            print(f"Age is : {i[2]}")
-            print(f"Salary is : {i[4]}\n")
-    else:
-        pass
-    
-####################################################
-# FOR UPDATING RECORDS FUNCTION DEFINITION
-def update():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    name = input("Enter Name: ")
-    age = int(input("Enter Age: "))
-    gender = input("Enter Gender: ")
-    salary = int(input("Enter Salary: "))
-    data = (name, age, gender, salary, idd,)
-    query = "UPDATE USERS set name = ?, age = ?, gender = ?, salary = ? WHERE id = ?"
-    result = cursor.execute(query, data)
-    con.commit()
-    cursor.close()
-    if (result):
-        print("Records Updated")
-    else:
-        print("Something Error in Updation")
+-- FOR UPDATING RECORDS
+function update()
+    local db = sqlite3.open("data.db")
+    print("Enter ID: ")
+    local id = io.read()
+    print("Enter Name: ")
+    local name = io.read()
+    print("Enter Age: ")
+    local age = io.read()
+    print("Enter Gender: ")
+    local gender = io.read()
+    print("Enter Salary: ")
+    local salary = io.read()
+    local stmt = db:prepare("UPDATE Users SET NAME = ?, AGE = ?, GENDER = ?, SALARY = ? WHERE ID = ?")
+    stmt:bind_values(name, age, gender, salary, id)
+    stmt:step()
+    stmt:finalize()
+    print("Records Updated")
+    db:close()
+end
 
-####################################################
-# FOR DELETING RECORDS FUNCTION DEFINITION
-def delete():
-    con = sqlite3.connect("data.db")
-    cursor = con.cursor()
-    idd = int(input("Enter ID: "))
-    query = "DELETE from USERS where ID = ?"
-    result = cursor.execute(query, (idd,))
-    con.commit()
-    cursor.close()
-    if (result):
-        print("One record Deleted")
-    else:
-        print("Something Error in Deletion")
+-- FOR DELETING RECORDS
+function delete()
+    local db = sqlite3.open("data.db")
+    print("Enter ID: ")
+    local id = io.read()
+    local stmt = db:prepare("DELETE FROM Users WHERE ID = ?")
+    stmt:bind_values(id)
+    stmt:step()
+    stmt:finalize()
+    print("One record Deleted")
+    db:close()
+end
 
-####################################################
-# MAIN BLOCK
-try:
-    while (True):
-        print("1). Insert Records: ")
-        print("2). Read Records: ")
-        print("3). Update Records: ")
-        print("4). Delete Records: ")
+-- MAIN FUNCTION
+function main()
+    while true do
+        print("1). Insert Records")
+        print("2). Read Records")
+        print("3). Update Records")
+        print("4). Delete Records")
         print("5). Exit")
-        ch = int(input("Enter Your Choice: "))
-        if (ch == 1):
+        print("Enter Your Choice: ")
+        local choice = io.read()
+        if choice == "1" then
             insert()
-        elif (ch == 2):
+        elseif choice == "2" then
             print("1). Read Single Record")
             print("2). Read All Records")
-            choice = int(input("Enter Your Choice: "))
-            if (choice == 1):
+            print("Enter Your Choice: ")
+            local subChoice = io.read()
+            if subChoice == "1" then
                 read_one()
-            elif (choice == 2):
+            elseif subChoice == "2" then
                 read_all()
-            else:
+            else
                 print("Wrong Choice Entered")
-        elif (ch == 3):
+            end
+        elseif choice == "3" then
             update()
-        elif (ch == 4):
+        elseif choice == "4" then
             delete()
-        elif (ch == 5):
+        elseif choice == "5" then
             break
-        else:
+        else
             print("Enter Correct Choice")
-except:
-    print("Database Error")
+        end
+    end
+end
 
-####################################################
-#END
+-- CALLING MAIN FUNCTION
+main()
