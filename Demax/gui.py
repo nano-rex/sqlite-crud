@@ -92,6 +92,8 @@ def gch():
     img2.anchor = 'H46'
     ws.add_image(img2)
     wb.save(filepath2)
+    print("GCH invoice generated successfully!")
+    print("Output path: " + filepath2)
 
 def d_o():
     global filepath1
@@ -180,6 +182,8 @@ def d_o():
     img2.anchor = 'H46'
     ws.add_image(img2)
     wb.save(filepath2)
+    print("D.O invoice generated successfully!")
+    print("Output path: " + filepath2)
 
 def dm():
     global filepath1
@@ -257,6 +261,8 @@ def dm():
     img2.anchor = 'H46'
     ws.add_image(img2)
     wb.save(filepath2)
+    print("DM invoice generated successfully!")
+    print("Output path: " + filepath2)
 
 def open_gui():
     global filepath1
