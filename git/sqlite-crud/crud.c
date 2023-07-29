@@ -3,6 +3,8 @@
 #include <string.h>
 #include <sqlite3.h>
 
+// gcc crud.c -o out.crud.c -lsqlite3
+
 void create() {
     sqlite3 *db;
     int rc = sqlite3_open("data.db", &db);

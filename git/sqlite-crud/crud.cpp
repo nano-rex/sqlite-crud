@@ -1,6 +1,8 @@
 #include <iostream>
 #include <sqlite3.h>
 
+// g++ crud.cpp -o out.crud.cpp -lsqlite3
+
 using namespace std;
 
 void create() {
