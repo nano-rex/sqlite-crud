@@ -39,7 +39,8 @@ python3 crud.py
 ```
 
 #### Java
-```java -classpath sqlite-jdbc-*.jar crud.java
+```
+java -classpath sqlite-jdbc-*.jar crud.java
 ```
 
 #### C++
