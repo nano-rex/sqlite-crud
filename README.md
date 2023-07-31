@@ -34,7 +34,7 @@ class Delete{
 
 #### Python
 ```
-pip install --user sqlite &nbsp;
+pip install --user sqlite
 python3 crud.py
 ```
 
@@ -45,13 +45,13 @@ java -classpath sqlite-jdbc-*.jar crud.java
 
 #### C++
 ```
-g++ crud.cpp -o out.crud.cpp &nbsp;
+g++ crud.cpp -o out.crud.cpp
 ./out.crud.cpp
 ```
 
 #### C
 ```
-gcc crud.c -o out.crud.c &nbsp;
+gcc crud.c -o out.crud.c
 ./out.crud.cpp
 ```
 
